@@ -7,3 +7,7 @@ export class CreateMovieDto {
     poster: string;
     createdBy: string;
 }
+
+export class MovieIdDto {
+    id: string
+}

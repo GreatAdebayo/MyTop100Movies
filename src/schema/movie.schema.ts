@@ -13,7 +13,7 @@ export const MovieSchema = new Schema({
         type: Number
     },
     genre: {
-        type: String
+        type: Array
     },
     rating: {
         type: Number
