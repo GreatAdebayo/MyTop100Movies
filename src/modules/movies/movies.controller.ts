@@ -1,6 +1,10 @@
 import { MoviesService } from './movies.service';
-import { CreateMovieDto, MovieIdDto } from '../../dto/create-movie.dto';
-import { Controller, Get, Post, Body, Put, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Res, UseGuards, Req } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+
+
+
+
 
 @Controller('api/')
 export class MoviesController {
@@ -8,15 +12,44 @@ export class MoviesController {
 
 
 
-    @Post('fetch-from-api')
-    async fetchAndSaveFromApi() {
-        const movies = await this.moviesService.fetchMoviesFromApi();
-        return movies;
+    @Get('fetch-from-api')
+    async fetchMoviesFromApi(@Res() res) {
+        const response = await this.moviesService.fetchMoviesFromApi();
+        return res.status(response.status).json(response)
     }
 
 
-    @Post('add-movies')
-    addMovies(@Body() movieId: MovieIdDto) {
-        return this.moviesService.addMovies(movieId);
+    @UseGuards(AuthGuard('jwt'))
+    @Post('movies')
+    async addMovies(@Req() req, @Body() body, @Res() res) {
+        const response = await this.moviesService.addMovies(req.user.id, body);
+        return res.status(response.status).json(response)
+    }
+
+
+
+    @UseGuards(AuthGuard('jwt'))
+    @Get('movies')
+    async getMovies(@Req() req, @Res() res) {
+        const response = await this.moviesService.getMovies(req.user.id);
+        return res.status(response.status).json(response)
+    }
+
+
+
+    @UseGuards(AuthGuard('jwt'))
+    @Get('movies/:id')
+    async getSingleMovie(@Req() req, @Param("id") id: string, @Res() res) {
+        const response = await this.moviesService.getSingleMovie(req.user.id, id);
+        return res.status(response.status).json(response)
+    }
+
+
+
+    @UseGuards(AuthGuard('jwt'))
+    @Delete('movies/:id')
+    async deleteMovie(@Req() req, @Param("id") id: string, @Res() res) {
+        const response = await this.moviesService.deleteMovie(req.user.id, id);
+        return res.status(response.status).json(response)
     }
 }
